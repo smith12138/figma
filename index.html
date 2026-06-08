@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%237c3aed'/><text x='50' y='68' font-size='52' font-weight='bold' fill='white' text-anchor='middle' font-family='sans-serif'>F</text></svg>">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Figma Hub - 原型代码管理</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+            background: #0f0b1a; color: #e2e0ea; line-height: 1.6; min-height: 100vh;
+        }
+
+        .page { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+        /* ── Top Bar ── */
+        .topbar {
+            padding: 20px 0; display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid rgba(124,58,237,0.15);
+        }
+        .topbar-left { display: flex; align-items: center; gap: 10px; }
+        .topbar-logo {
+            font-size: 17px; font-weight: 700; color: #fff;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .topbar-logo .icon {
+            width: 32px; height: 32px; background: linear-gradient(135deg, #7c3aed, #a78bfa);
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+        }
+        .topbar-logo .icon svg { width: 18px; height: 18px; }
+        .topbar-logo span { color: #a78bfa; }
+        .topbar-back {
+            font-size: 13px; color: #9b8ec4; text-decoration: none; transition: color .2s;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .topbar-back:hover { color: #c4b5fd; }
+
+        /* ── Hero ── */
+        .hero { padding: 56px 0 44px; }
+        .hero h1 { font-size: 32px; font-weight: 800; color: #fff; margin-bottom: 8px; }
+        .hero h1 span { background: linear-gradient(135deg, #7c3aed, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero p { font-size: 15px; color: #7c71a0; max-width: 520px; }
+
+        /* ── Stats ── */
+        .stats { display: flex; gap: 16px; margin-bottom: 40px; }
+        .stat {
+            background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.15);
+            border-radius: 14px; padding: 20px 28px; flex: 1; text-align: center;
+        }
+        .stat .num { font-size: 36px; font-weight: 800; color: #c084fc; }
+        .stat .label { font-size: 12px; color: #7c71a0; margin-top: 2px; letter-spacing: 0.5px; }
+
+        /* ── Section ── */
+        .section-title {
+            font-size: 12px; font-weight: 600; color: #7c71a0; text-transform: uppercase;
+            letter-spacing: 1.5px; margin-bottom: 16px;
+        }
+
+        /* ── Project Grid ── */
+        .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; margin-bottom: 60px; }
+        .project-card {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(124,58,237,0.12);
+            border-radius: 16px; padding: 24px; cursor: pointer; transition: all .25s;
+            position: relative; overflow: hidden;
+        }
+        .project-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: var(--accent); opacity: 0; transition: opacity .25s;
+        }
+        .project-card:hover { border-color: rgba(124,58,237,0.35); transform: translateY(-3px); box-shadow: 0 8px 32px rgba(124,58,237,0.12); }
+        .project-card:hover::before { opacity: 1; }
+        .card-top { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+        .card-icon {
+            width: 44px; height: 44px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+            font-size: 18px; font-weight: 800; color: #fff;
+        }
+        .card-info { flex: 1; }
+        .card-name { font-size: 16px; font-weight: 700; color: #fff; }
+        .card-desc { font-size: 12px; color: #7c71a0; margin-top: 2px; }
+        .card-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+        .card-tag {
+            font-size: 11px; padding: 3px 10px; border-radius: 6px;
+            background: rgba(124,58,237,0.1); color: #c084fc; font-weight: 500;
+        }
+        .card-footer { display: flex; align-items: center; justify-content: space-between; }
+        .card-screens { font-size: 12px; color: #7c71a0; }
+        .card-screens strong { color: #c084fc; font-weight: 700; }
+        .card-date { font-size: 11px; color: #564d73; }
+
+        /* ── Detail View ── */
+        .detail-view { display: none; }
+        .detail-view.active { display: block; }
+        .detail-header {
+            display: flex; align-items: center; gap: 16px; margin-bottom: 28px;
+            padding-bottom: 20px; border-bottom: 1px solid rgba(124,58,237,0.12);
+        }
+        .detail-back {
+            width: 36px; height: 36px; border-radius: 10px; border: 1px solid rgba(124,58,237,0.2);
+            background: rgba(124,58,237,0.06); color: #a78bfa; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; transition: all .2s;
+        }
+        .detail-back:hover { border-color: #7c3aed; background: rgba(124,58,237,0.15); }
+        .detail-title { font-size: 22px; font-weight: 700; color: #fff; }
+        .detail-desc { font-size: 13px; color: #7c71a0; margin-left: auto; }
+
+        /* ── Screen List ── */
+        .screen-section { margin-bottom: 32px; }
+        .screen-section h3 { font-size: 14px; font-weight: 600; color: #c084fc; margin-bottom: 12px; }
+        .screen-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
+        .screen-item {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(124,58,237,0.1);
+            border-radius: 10px; padding: 14px 16px; display: flex; align-items: center; gap: 10px;
+        }
+        .screen-num {
+            width: 28px; height: 28px; border-radius: 8px; background: rgba(124,58,237,0.12);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700; color: #c084fc; flex-shrink: 0;
+        }
+        .screen-name { font-size: 13px; color: #e2e0ea; }
+
+        /* ── Code Block ── */
+        .code-section { margin-bottom: 40px; }
+        .code-header {
+            display: flex; align-items: center; justify-content: space-between;
+            background: #1a1028; border: 1px solid rgba(124,58,237,0.15);
+            border-bottom: none; border-radius: 12px 12px 0 0; padding: 14px 20px;
+        }
+        .code-filename { font-size: 13px; color: #a78bfa; font-family: 'SF Mono', 'Fira Code', monospace; font-weight: 600; }
+        .code-size { font-size: 11px; color: #564d73; }
+        .copy-btn {
+            padding: 8px 20px; border-radius: 8px; border: 1px solid rgba(124,58,237,0.3);
+            background: rgba(124,58,237,0.12); color: #c084fc; font-size: 13px;
+            font-weight: 600; cursor: pointer; transition: all .2s;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .copy-btn:hover { background: #7c3aed; color: #fff; border-color: #7c3aed; }
+        .copy-btn.copied { background: #059669; border-color: #059669; color: #fff; }
+        .code-block {
+            background: #110d1b; border: 1px solid rgba(124,58,237,0.15);
+            border-top: none; border-radius: 0 0 12px 12px; padding: 20px;
+            max-height: 420px; overflow-y: auto; scrollbar-width: thin;
+            scrollbar-color: rgba(124,58,237,0.3) transparent;
+        }
+        .code-block::-webkit-scrollbar { width: 6px; }
+        .code-block::-webkit-scrollbar-track { background: transparent; }
+        .code-block::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.3); border-radius: 3px; }
+        .code-block pre {
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 12px; line-height: 1.7; color: #b8b0d0; white-space: pre-wrap;
+            word-break: break-word; margin: 0;
+        }
+
+        /* ── Usage Guide ── */
+        .usage-section { margin-bottom: 40px; }
+        .usage-steps {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px;
+        }
+        .step {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(124,58,237,0.1);
+            border-radius: 12px; padding: 18px;
+        }
+        .step-num {
+            width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #a78bfa);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 10px;
+        }
+        .step-title { font-size: 13px; font-weight: 600; color: #e2e0ea; margin-bottom: 4px; }
+        .step-desc { font-size: 12px; color: #7c71a0; line-height: 1.5; }
+
+        /* ── Footer ── */
+        .footer { text-align: center; font-size: 12px; color: #3d3558; padding: 30px 0; border-top: 1px solid rgba(124,58,237,0.08); }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: #7c3aed; color: #fff; padding: 12px 28px; border-radius: 10px;
+            font-size: 14px; font-weight: 600; box-shadow: 0 8px 32px rgba(124,58,237,0.4);
+            transition: transform .3s cubic-bezier(0.34,1.56,0.64,1); z-index: 100; pointer-events: none;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+
+        @media (max-width: 640px) {
+            .stats { flex-direction: column; }
+            .project-grid { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <div class="topbar">
+        <div class="topbar-left">
+            <div class="topbar-logo">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+                </div>
+                Figma <span>Hub</span>
+            </div>
+        </div>
+        <a class="topbar-back" href="https://smith12138.github.io/html-pages/">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            返回 Docs Hub
+        </a>
+    </div>
+
+    <div class="hero">
+        <h1>Figma <span>原型代码库</span></h1>
+        <p>管理和分发 Figma 插件原型代码。选择项目，复制代码，粘贴到 Figma Scripter 插件即可生成完整交互原型。</p>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <!-- Projects View -->
+    <div id="projectsView">
+        <div class="section-title">全部项目</div>
+        <div class="project-grid" id="projectGrid"></div>
+    </div>
+
+    <!-- Detail View -->
+    <div class="detail-view" id="detailView">
+        <div class="detail-header">
+            <button class="detail-back" onclick="showProjects()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <span class="detail-title" id="detailTitle"></span>
+            <span class="detail-desc" id="detailDesc"></span>
+        </div>
+
+        <div class="usage-section">
+            <div class="section-title">使用方法</div>
+            <div class="usage-steps">
+                <div class="step"><div class="step-num">1</div><div class="step-title">打开 Figma</div><div class="step-desc">在浏览器或桌面版打开你的 Figma 设计文件</div></div>
+                <div class="step"><div class="step-num">2</div><div class="step-title">运行 Scripter</div><div class="step-desc">主菜单 → Plugins → 搜索并运行 Scripter 插件</div></div>
+                <div class="step"><div class="step-num">3</div><div class="step-title">粘贴代码</div><div class="step-desc">在 Scripter 中点击 "+" 新建脚本，Cmd+A 全选后 Cmd+V 粘贴</div></div>
+                <div class="step"><div class="step-num">4</div><div class="step-title">点击运行</div><div class="step-desc">点击右上角 ▶ 按钮，原型将自动生成在画布上</div></div>
+            </div>
+        </div>
+
+        <div class="screen-section">
+            <div class="section-title">包含页面</div>
+            <div class="screen-grid" id="screenGrid"></div>
+        </div>
+
+        <div class="code-section" id="codeSection"></div>
+    </div>
+
+    <div class="footer">Figma Hub · Prototype Code Manager</div>
+</div>
+
+<div class="toast" id="toast">已复制到剪贴板</div>
+
+<script>
+let projects = [];
+let codeCache = {};
+
+async function loadProjects() {
+    const base = location.pathname.replace(/\/index\.html$/, '').replace(/\/$/, '');
+    const dirs = await fetchDirs(base);
+    projects = dirs;
+    renderStats();
+    renderProjects();
+}
+
+async function fetchDirs(base) {
+    const result = [];
+    try {
+        const resp = await fetch(base + '/manifest.json');
+        if (resp.ok) return await resp.json();
+    } catch (e) {}
+    // Fallback: scan known projects via meta.json
+    const knownProjects = ['SaleSmartly'];
+    for (const name of knownProjects) {
+        try {
+            const resp = await fetch(base + '/' + encodeURIComponent(name) + '/meta.json');
+            if (resp.ok) {
+                const meta = await resp.json();
+                meta.id = name;
+                result.push(meta);
+            }
+        } catch (e) {}
+    }
+    return result;
+}
+
+function renderStats() {
+    const totalScreens = projects.reduce((s, p) => s + (p.screens || 0), 0);
+    document.getElementById('stats').innerHTML = `
+        <div class="stat"><div class="num">${projects.length}</div><div class="label">项目</div></div>
+        <div class="stat"><div class="num">${totalScreens}</div><div class="label">原型页面</div></div>
+        <div class="stat"><div class="num">${projects.reduce((s, p) => s + (p.tags || []).length, 0)}</div><div class="label">标签</div></div>
+    `;
+}
+
+function renderProjects() {
+    const grid = document.getElementById('projectGrid');
+    grid.innerHTML = projects.map(p => `
+        <div class="project-card" style="--accent:${p.color}" onclick="showDetail('${p.id}')">
+            <div class="card-top">
+                <div class="card-icon" style="background:${p.color}">${(p.name || p.id)[0]}</div>
+                <div class="card-info">
+                    <div class="card-name">${p.name || p.id}</div>
+                    <div class="card-desc">${p.description || ''}</div>
+                </div>
+            </div>
+            <div class="card-meta">
+                ${(p.tags || []).map(t => `<span class="card-tag">${t}</span>`).join('')}
+            </div>
+            <div class="card-footer">
+                <div class="card-screens">包含 <strong>${p.screens || 0}</strong> 个原型页面</div>
+                <div class="card-date">${p.date || ''}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function showDetail(id) {
+    const proj = projects.find(p => p.id === id);
+    if (!proj) return;
+
+    document.getElementById('projectsView').style.display = 'none';
+    document.getElementById('detailView').classList.add('active');
+    document.getElementById('detailTitle').textContent = proj.name || proj.id;
+    document.getElementById('detailDesc').textContent = proj.description || '';
+
+    // Screens
+    const screenGrid = document.getElementById('screenGrid');
+    const screens = proj.screenList || [];
+    screenGrid.innerHTML = screens.map((s, i) => `
+        <div class="screen-item">
+            <div class="screen-num">${i + 1}</div>
+            <div class="screen-name">${s}</div>
+        </div>
+    `).join('');
+
+    // Code
+    const codeSection = document.getElementById('codeSection');
+    const fileName = proj.file || 'prototype.js';
+    const base = location.pathname.replace(/\/index\.html$/, '').replace(/\/$/, '');
+    const filePath = base + '/' + encodeURIComponent(id) + '/' + encodeURIComponent(fileName);
+
+    let code = codeCache[id];
+    if (!code) {
+        try {
+            const resp = await fetch(filePath);
+            code = await resp.text();
+            codeCache[id] = code;
+        } catch (e) {
+            code = '// 代码加载失败';
+        }
+    }
+
+    const lines = code.split('\n').length;
+    const size = new Blob([code]).size;
+    const sizeStr = size > 1024 ? (size / 1024).toFixed(1) + ' KB' : size + ' B';
+
+    codeSection.innerHTML = `
+        <div class="section-title">原型代码</div>
+        <div class="code-header">
+            <div>
+                <div class="code-filename">${fileName}</div>
+                <div class="code-size">${lines} 行 · ${sizeStr}</div>
+            </div>
+            <button class="copy-btn" id="copyBtn" onclick="copyCode('${id}')">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                复制代码
+            </button>
+        </div>
+        <div class="code-block"><pre id="codeContent"></pre></div>
+    `;
+    document.getElementById('codeContent').textContent = code;
+}
+
+function showProjects() {
+    document.getElementById('detailView').classList.remove('active');
+    document.getElementById('projectsView').style.display = 'block';
+}
+
+function copyCode(id) {
+    const code = codeCache[id];
+    if (!code) return;
+    navigator.clipboard.writeText(code).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.classList.add('copied');
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> 已复制';
+        showToast('代码已复制到剪贴板，去 Figma Scripter 粘贴运行吧');
+        setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> 复制代码';
+        }, 3000);
+    });
+}
+
+function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2800);
+}
+
+loadProjects();
+</script>
+</body>
+</html>
