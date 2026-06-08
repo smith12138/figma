@@ -43,7 +43,7 @@ t(p,28,yy-13,navLabels[i][0],10,C.w,"Medium");
 
 // ===== SCREEN 1: CHAT =====
 function createChat(ox,oy){
-const f=frame("1-Chat",ox,oy);nav(f,0);
+const f=frame("1-聊天主界面",ox,oy);nav(f,0);
 // Session list panel
 r(f,64,0,320,900,C.card,"sessionPanel");line(f,384,0,1,C.bdr);r(f,384,0,1,900,C.bdr);
 // Search
@@ -153,7 +153,7 @@ return f;
 
 // ===== SCREEN 2: CONTACTS =====
 function createContacts(ox,oy){
-const f=frame("2-Contacts",ox,oy);nav(f,1);
+const f=frame("2-客户管理",ox,oy);nav(f,1);
 // Header
 r(f,64,0,1376,56,C.card,"header");line(f,64,56,1376,C.bdr);
 t(f,88,16,"客户管理",20,C.td,"Bold");
@@ -219,7 +219,7 @@ return f;
 
 // ===== SCREEN 3: CONTACT DETAIL =====
 function createContactDetail(ox,oy){
-const f=frame("3-ContactDetail",ox,oy);nav(f,1);
+const f=frame("3-客户详情",ox,oy);nav(f,1);
 // Breadcrumb
 r(f,64,0,1376,44,C.card,"breadcrumb");line(f,64,44,1376,C.bdr);
 t(f,88,14,"客户管理",12,C.pri,"Medium");t(f,160,14,">",12,C.tl,"Regular");t(f,176,14,"李伟",12,C.td,"Medium");
@@ -301,7 +301,7 @@ return f;
 
 // ===== SCREEN 4: CAMPAIGN LIST =====
 function createCampaignList(ox,oy){
-const f=frame("4-Campaigns",ox,oy);nav(f,2);
+const f=frame("4-营销群发",ox,oy);nav(f,2);
 // Header
 r(f,64,0,1376,56,C.card,"header");line(f,64,56,1376,C.bdr);
 t(f,88,16,"营销群发",20,C.td,"Bold");
@@ -356,7 +356,7 @@ return f;
 
 // ===== SCREEN 5: CAMPAIGN EDITOR =====
 function createCampaignEditor(ox,oy){
-const f=frame("5-CampaignEditor",ox,oy);
+const f=frame("5-营销编辑器",ox,oy);
 // Collapsed nav
 r(f,0,0,64,900,C.nav,"nav");rr(f,16,16,32,32,C.pri,8);t(f,26,23,"S",14,C.w,"Bold");
 for(let i=0;i<navLabels.length;i++){ellipse(f,22,80+i*56-16,20,20,i===2?C.pri:c(60,40,110));t(f,28,80+i*56-13,navLabels[i][0],10,C.w,"Medium");}
@@ -447,7 +447,7 @@ return f;
 
 // ===== SCREEN 6: AUTOMATION LIST =====
 function createAutomationList(ox,oy){
-const f=frame("6-Automation",ox,oy);nav(f,3);
+const f=frame("6-自动化流程列表",ox,oy);nav(f,3);
 r(f,64,0,1376,56,C.card);line(f,64,56,1376,C.bdr);
 t(f,88,16,"自动化流程",20,C.td,"Bold");
 btn(f,1280,12,140,32,C.pri,"新建流程",C.w,12);
@@ -506,7 +506,7 @@ return f;
 
 // ===== SCREEN 7: FLOW EDITOR =====
 function createFlowEditor(ox,oy){
-const f=frame("7-FlowEditor",ox,oy);
+const f=frame("7-自动化流程编辑器",ox,oy);
 // Collapsed nav
 r(f,0,0,48,900,C.nav,"navCollapsed");rr(f,8,12,32,32,C.pri,8);t(f,18,19,"S",14,C.w,"Bold");
 for(let i=0;i<navLabels.length;i++){ellipse(f,14,64+i*48,20,20,i===3?C.pri:c(60,40,110));t(f,20,67+i*48,navLabels[i][0],9,C.w,"Medium");}
@@ -598,7 +598,7 @@ return f;
 
 // ===== SCREEN 8: AI AGENT =====
 function createAIAgent(ox,oy){
-const f=frame("8-AIAgent",ox,oy);nav(f,4);
+const f=frame("8-AI客服配置",ox,oy);nav(f,4);
 r(f,64,0,1376,56,C.card);line(f,64,56,1376,C.bdr);
 t(f,88,16,"AI 客服",20,C.td,"Bold");
 badge(f,200,18,60,24,C.okL,"已启用",C.ok,11);
@@ -699,7 +699,7 @@ return f;
 
 // ===== SCREEN 9: ANALYTICS =====
 function createAnalytics(ox,oy){
-const f=frame("9-Analytics",ox,oy);nav(f,5);
+const f=frame("9-数据报表",ox,oy);nav(f,5);
 r(f,64,0,1376,56,C.card);line(f,64,56,1376,C.bdr);
 t(f,88,16,"数据报表",20,C.td,"Bold");
 // Date picker
@@ -803,7 +803,7 @@ return f;
 
 // ===== SCREEN 10: CHANNELS =====
 function createChannels(ox,oy){
-const f=frame("10-Channels",ox,oy);nav(f,6);
+const f=frame("10-渠道集成",ox,oy);nav(f,6);
 r(f,64,0,1376,56,C.card);line(f,64,56,1376,C.bdr);
 t(f,88,16,"渠道集成",20,C.td,"Bold");
 btn(f,1300,12,120,32,C.pri,"添加渠道",C.w,12);
@@ -857,7 +857,7 @@ return f;
 
 // ===== SCREEN 11: TEAM =====
 function createTeam(ox,oy){
-const f=frame("11-Team",ox,oy);nav(f,7);
+const f=frame("11-团队管理",ox,oy);nav(f,7);
 r(f,64,0,1376,56,C.card);line(f,64,56,1376,C.bdr);
 t(f,88,16,"团队管理",20,C.td,"Bold");
 btn(f,1280,12,140,32,C.pri,"邀请成员",C.w,12);
@@ -922,7 +922,7 @@ return f;
 
 // ===== SCREEN 12: SETTINGS =====
 function createSettings(ox,oy){
-const f=frame("12-Settings",ox,oy);nav(f,7);
+const f=frame("12-系统设置",ox,oy);nav(f,7);
 // Settings sidebar
 r(f,64,0,240,900,C.card);r(f,304,0,1,900,C.bdr);
 t(f,88,20,"设置",16,C.td,"Bold");
